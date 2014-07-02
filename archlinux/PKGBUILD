@@ -1,0 +1,31 @@
+# Maintainer: Benoit Pierre <benoit.pierre@gmail.com>
+
+pkgname=acoc
+pkgver=0.7.1
+pkgrel=1
+pkgdesc='Arbitrary Command Output Colourer'
+arch=('any')
+url='http://www.caliban.org/ruby/acoc.shtml'
+license=('GPL2')
+depends=(
+  'ruby'
+  'ruby-term-ansicolor'
+)
+makedepends=(
+  'rake'
+)
+backup=('etc/acoc.conf')
+
+package() {
+  cd $pkgname-$pkgver
+  local _gemdir="$(ruby -e'puts Gem.default_dir')"
+  local _gemname="$(ruby -r ./lib/acoc/version.rb -e 'print "acoc-#{ACOC::VERSION}"')"
+  rake build
+  gem install --ignore-dependencies --no-user-install -N -i "${pkgdir}"/${_gemdir} -n "${pkgdir}"/usr/bin "pkg/${_gemname}.gem"
+  install -dm 755 "${pkgdir}"/etc "${pkgdir}"/usr/share/licenses/${pkgname}
+  ln -s ${_gemdir}/gems/${_gemname}/LICENSE.txt "${pkgdir}"/usr/share/licenses/${pkgname}/
+  ln -s ${_gemdir}/gems/${_gemname}/acoc.conf "${pkgdir}"/etc/
+  chmod og=rX -R ${pkgdir}
+}
+
+# vim:set ts=2 sw=2 et:
